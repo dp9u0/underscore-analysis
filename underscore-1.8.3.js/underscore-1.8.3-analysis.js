@@ -2997,12 +2997,14 @@
             // 将 name 方法挂载到 _ 对象的原型链上，使之能 OOP 调用
             _.prototype[name] = function() {
                 // 第一个参数
-                var thisArgs = [this._wrapped];
+                var wrapped = [this._wrapped];
 
                 // arguments 为 name 方法需要的其他参数
-                push.apply(thisArgs, arguments);
+                push.apply(wrapped, arguments);
                 // 执行 func 方法
                 // 支持链式操作
+                // func.apply(_, args) ==>  _.func(args); ==> _.func(this._wrapped,arguments);
+                // this instanceof _ === true                
                 return result(this, func.apply(_, args));
             };
         });
