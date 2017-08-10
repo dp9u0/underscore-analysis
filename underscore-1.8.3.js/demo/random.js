@@ -18,3 +18,8 @@ for (var index = 0; index < MAX_COUNT; index++) {
 }
 console.log(randon2);
 console.log(Date.now() - start2);
+
+// var random = Math.random() * (MAX - MIN + 1);
+// console.log(random);
+// console.log(~random);
+// console.log(~~random);
