@@ -25,6 +25,20 @@ fun.prototype = {
     }
 }
 
+// var fun = function() {
+//     this.info = {
+//         name: 'peter',
+//         age: 25
+//     }
+// }
+
+// fun.prototype = {
+//     info: {
+//         name: 'peter',
+//         age: 25
+//     }
+// }
+
 var a = new fun();
 var b = new fun();
 
