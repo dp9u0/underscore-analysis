@@ -1395,31 +1395,23 @@
         // 非 new 调用 _.bind 返回的方法（即 bound）
         // callingContext 不是 boundFunc 的一个实例
         if (!(callingContext instanceof boundFunc))
+        // 说明是非new 操作 即 直接调用 boundFunc()
             return sourceFunc.apply(context, args);
 
         // 如果是用 new 调用 _.bind 返回的方法
+        // 即 new boundFunc();  这时候按照 new sourceFunc() 处理
+        // new 操作做了哪些事情?
 
-        // self 为 sourceFunc 的实例，继承了它的原型链
-        // self 理论上是一个空对象（还没赋值），但是有原型链
-        var self = baseCreate(sourceFunc.prototype);
-
-        // 用 new 生成一个构造函数的实例
-        // 正常情况下是没有返回值的，即 result 值为 undefined
-        // 如果构造函数有返回值
-        // 如果返回值是对象（非 null），则 new 的结果返回这个对象
-        // 否则返回实例
         // @see http://www.cnblogs.com/zichi/p/4392944.html
+        // 1.创建一个空对象
+        // 2.将所创建对象的__proto__属性值设成构造函数的prototype属性值
+        var self = baseCreate(sourceFunc.prototype);
+        // 3.执行构造函数中的代码，构造函数中的this指向该对象
+        // 4.返回该对象（除非构造函数中返回一个对象）
         var result = sourceFunc.apply(self, args);
-
-        // 如果构造函数返回了对象
-        // 则 new 的结果是这个对象
-        // 返回这个对象
+        // 如果构造函数有返回值 返回值是对象（非 null），则 new 的结果返回这个对象
         if (_.isObject(result)) return result;
-
         // 否则返回 self
-        // var result = sourceFunc.apply(self, args);
-        // self 对象当做参数传入
-        // 会直接改变值
         return self;
     };
 
