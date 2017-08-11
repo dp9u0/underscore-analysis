@@ -239,7 +239,7 @@
         if (nativeCreate) return nativeCreate(prototype);
 
         Ctor.prototype = prototype;
-        var result = new Ctor;
+        var result = new Ctor(); //better 
         Ctor.prototype = null;
         return result;
     };
@@ -1798,7 +1798,7 @@
                 result = args[i].call(this, result);
             return result;
         };
-    };
+    }; //
 
     // Returns a function that will only be executed on and after the Nth call.
     // 第 times 触发执行 func（事实上之后的每次触发还是会执行 func）
@@ -1832,6 +1832,7 @@
             }
 
             // func 引用置为空，其实不置为空也用不到 func 了
+            // memory leak ?
             if (times <= 1)
                 func = null;
 
