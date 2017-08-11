@@ -1,3 +1,5 @@
+// http://drupalmotion.com/article/debounce-and-throttle-visual-explanation
+
 var _ = require('../underscore-1.8.3-analysis');
 
 var count = 0;
