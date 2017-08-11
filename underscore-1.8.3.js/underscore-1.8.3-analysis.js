@@ -1483,6 +1483,7 @@
     // are the method names to be bound. Useful for ensuring that all callbacks
     // defined on an object belong to it.
     // 指定一系列方法（methodNames）中的 this 指向（object）
+    // 并将这些方法继承给obj
     // _.bindAll(object, *methodNames)
     _.bindAll = function(obj) {
         var i, length = arguments.length,
@@ -1516,26 +1517,23 @@
     // if false - run function, and store output in hash
     // if true, return output stored in hash
     _.memoize = function(func, hasher) {
-        var memoize = function(key) {
+        // 感觉这样改更好理解一点
+        var memoize = function() {
             // 储存变量，方便使用
             var cache = memoize.cache;
-
             // 求 key
             // 如果传入了 hasher，则用 hasher 函数来计算 key
             // 否则用 参数 key（即 memoize 方法传入的第一个参数）当 key
-            var address = '' + (hasher ? hasher.apply(this, arguments) : key);
-
+            // TODO:为什么不适用 arguments.concat 作为 address 呢?
+            var address = '' + (hasher ? hasher.apply(this, arguments) : arguments[0]);
             // 如果这个 key 还没被 hash 过（还没求过值）
             if (!_.has(cache, address))
                 cache[address] = func.apply(this, arguments);
-
             // 返回
             return cache[address];
         };
-
         // cache 对象被当做 key-value 键值对缓存中间运算结果
         memoize.cache = {};
-
         // 返回一个函数（经典闭包）
         return memoize;
     };
@@ -1563,6 +1561,7 @@
     // 如果传入 *arguments，会被当做参数，和 _.delay 调用方式类似（少了第二个参数）
     // 其实核心还是调用了 _.delay 方法，但第二个参数（wait 参数）设置了默认值为 1
     // 如何使得方法能设置默认值？用 _.partial 方法
+    // 这里的 _ 其实是个占位符 用来站位 func
     _.defer = _.partial(_.delay, _, 1);
 
     // Returns a function, that, when invoked, will only be triggered at most once
