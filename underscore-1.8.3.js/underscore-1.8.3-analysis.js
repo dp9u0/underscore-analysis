@@ -1575,7 +1575,7 @@
     // 那么不会马上触发（等待 wait milliseconds 后第一次触发 func）
     // 如果 options 参数传入 {trailing: false}
     // 那么最后一次回调不会被触发
-    // **Notice: options 不能同时设置 leading 和 trailing 为 false**
+    // **Notice: options 不能同时设置 leading 和 trailing 为 false** ?? 可以设置啊
     // 示例：
     // var throttled = _.throttle(updatePosition, 100);
     // $(window).scroll(throttled);
@@ -1614,6 +1614,10 @@
 
             // 这里的 timeout 变量一定是 null 了吧
             // 是否没有必要进行判断？
+            // 防止later 执行时 再次被调用 执行代码 timeout = setTimeout(later, remaining);
+            // 目前 node 和 javascript 事件队列应该都不会出现这样的问题 
+            // 估计是考虑多线程的情况的情况
+            // 感觉过度设计了
             if (!timeout)
                 context = args = null;
         };
@@ -1649,6 +1653,7 @@
 
             // console.log(remaining) 可以打印出来看看
             if (remaining <= 0 || remaining > wait) {
+                console.log(remaining);
                 if (timeout) {
                     clearTimeout(timeout);
                     // 解除引用，防止内存泄露
@@ -1664,7 +1669,10 @@
                 result = func.apply(context, args);
 
                 // 引用置为空，防止内存泄露
-                // 感觉这里的 timeout 肯定是 null 啊？这个 if 判断没必要吧？
+                // 防止执行这段代码时 再次被调用 执行代码 timeout = setTimeout(later, remaining);
+                // 目前 node 和 javascript 事件队列应该都不会出现这样的问题 
+                // 估计是考虑多线程的情况的情况
+                // 感觉过度设计了
                 if (!timeout)
                     context = args = null;
             } else if (!timeout && options.trailing !== false) { // 最后一次需要触发的情况
@@ -1673,7 +1681,6 @@
                 // 间隔 remaining milliseconds 后触发 later 方法
                 timeout = setTimeout(later, remaining);
             }
-
             // 回调返回值
             return result;
         };
@@ -1699,6 +1706,7 @@
             // 时间间隔 last 在 [0, wait) 中
             // 还没到触发的点，则继续设置定时器
             // last 值应该不会小于 0 吧？
+            // by guodp : 可能会小于 0  系统时间调整  now 小于上次记录的时间...
             if (last < wait && last >= 0) {
                 timeout = setTimeout(later, wait - last);
             } else {
@@ -1714,9 +1722,10 @@
                     result = func.apply(context, args);
                     // 这里的 timeout 一定是 null 了吧
                     // 感觉这个判断多余了
+                    // 多线程情况下可能会出现这种情况 过度设计
                     if (!timeout)
                         context = args = null;
-                }
+                } //else { 下次触发可以直接执行了 immediate }
             }
         };
 
@@ -1735,9 +1744,8 @@
 
             // 立即触发需要满足两个条件
             // immediate 参数为 true，并且 timeout 还没设置
-            // immediate 参数为 true 是显而易见的
-            // 如果去掉 !timeout 的条件，就会一直触发，而不是触发一次
-            // 因为第一次触发后已经设置了 timeout，所以根据 timeout 是否为空可以判断是否是首次触发
+            // timeout 说明 1.第一次执行
+            // or 2. 距离上次触发已经超过 wait 时间了 根据 later 中的else分支
             var callNow = immediate && !timeout;
 
             // 设置 wait seconds 后触发 later 方法
@@ -1754,7 +1762,6 @@
                 // 解除引用
                 context = args = null;
             }
-
             return result;
         };
     };
