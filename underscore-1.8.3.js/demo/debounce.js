@@ -9,7 +9,8 @@ var log = function(count) {
 
 // immediate : 是否立刻执行
 
-var throttle = _.debounce(log, 100, true);
+var throttle = _.debounce(log, 100);
+//var throttle = myDebounce(log, 100);
 
 var run = function() {
     var c = ++count;
@@ -18,3 +19,14 @@ var run = function() {
 };
 
 setTimeout(run, 100);
+
+function myDebounce(func, timeout, context) {
+    context = context || this;
+    return function() {
+        var args = arguments;
+        clearTimeout(func.__timeId__);
+        func.__timeId__ = setTimeout(function() {
+            func.apply(context, args);
+        }, timeout);
+    };
+}
