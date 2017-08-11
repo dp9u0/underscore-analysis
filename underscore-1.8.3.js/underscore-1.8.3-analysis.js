@@ -2666,6 +2666,8 @@
             max = min;
             min = 0;
         }
+        // may be more fast 
+        // min + (~~(Math.random() * (max - min + 1)));
         return min + Math.floor(Math.random() * (max - min + 1));
     };
 
